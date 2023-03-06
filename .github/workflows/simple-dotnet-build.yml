@@ -1,0 +1,13 @@
+name: Simple Dotnet Build
+
+on:
+  pull_request:
+    branches: [ "main" ]
+  workflow_dispatch:
+    
+jobs:
+  build:
+    uses: Demotemp01/pipeline-templates/.github/workflows/simple-dotnet-build.yml@main
+    with:
+      dotnet-version: 7.0.x    
+       
