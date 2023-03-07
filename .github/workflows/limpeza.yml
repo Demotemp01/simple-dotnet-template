@@ -1,6 +1,8 @@
 name: Limpeza dos recursos
 
 on:
+  schedule:
+  - cron: "0 23 * * *"
   workflow_dispatch:
 
 jobs:
@@ -21,3 +23,5 @@ jobs:
       - name: Excluir Repositório
         run: |
           gh repo delete $GITHUB_REPOSITORY --yes
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
