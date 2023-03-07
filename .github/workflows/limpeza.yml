@@ -1,0 +1,23 @@
+name: Limpeza dos recursos
+
+on:
+  workflow_dispatch:
+
+jobs:
+  limpeza:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_LOGIN }}
+
+      - name: Excluir Resources
+        run: |
+          az group delete -n ${{ vars.RGNAMEDEV }} --yes
+          az group delete -n ${{ vars.RGNAMEHML }} --yes
+          az group delete -n ${{ vars.RGNAMEPRD }} --yes
+    
+      - name: Excluir Repositório
+        run: |
+          gh repo delete $GITHUB_REPOSITORY --yes
