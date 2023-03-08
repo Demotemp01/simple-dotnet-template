@@ -36,7 +36,7 @@ jobs:
       - name: Criar Resources
         run: |
           az group create -l brazilsouth -n ${{ vars.RGNAMEDEV }}
-          az deployment group create --mode Incremental --resource-group ${{ vars.RGNAMEDEV }} --template-file ./bicep/webapp.bicep --parameters webAppName=poc-dev-${{ vars.CLIENTE }}-${{ vars.RANDOMNAME }} 
+          az deployment group create --mode Incremental --resource-group ${{ vars.RGNAMEDEV }} --template-file ./bicep/webapp.bicep --parameters appName=poc environment=dev appNUm=${{ vars.CLIENTE }}-${{ vars.RANDOMNAME }} 
 
       - name: Deploy to Azure Web App
         id: deploy-to-webapp
@@ -70,7 +70,7 @@ jobs:
       - name: Criar Resources
         run: |
           az group create -l brazilsouth -n ${{ vars.RGNAMEHML }}
-          az deployment group create --mode Incremental --resource-group ${{ vars.RGNAMEHML }} --template-file ./bicep/webapp.bicep --parameters webAppName=poc-hml-${{ vars.CLIENTE }}-${{ vars.RANDOMNAME }} 
+          az deployment group create --mode Incremental --resource-group ${{ vars.RGNAMEHML }} --template-file ./bicep/webapp.bicep --parameters appName=poc environment=hml appNUm=${{ vars.CLIENTE }}-${{ vars.RANDOMNAME }}
 
       - name: Deploy to Azure Web App
         id: deploy-to-webapp
@@ -104,7 +104,7 @@ jobs:
       - name: Criar Resources
         run: |
           az group create -l brazilsouth -n ${{ vars.RGNAMEPRD }}
-          az deployment group create --mode Incremental --resource-group ${{ vars.RGNAMEPRD }} --template-file ./bicep/webapp.bicep --parameters webAppName=poc-prd-${{ vars.CLIENTE }}-${{ vars.RANDOMNAME }} 
+          az deployment group create --mode Incremental --resource-group ${{ vars.RGNAMEPRD }} --template-file ./bicep/webapp.bicep --parameters appName=poc environment=prd appNUm=${{ vars.CLIENTE }}-${{ vars.RANDOMNAME }} 
 
       - name: Deploy to Azure Web App
         id: deploy-to-webapp

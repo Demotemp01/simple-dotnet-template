@@ -1,30 +1,21 @@
-param webAppName string
-param sku string = 'B1' 
-param linuxFxVersion string = 'DOTNETCORE|7.0'
-param location string = resourceGroup().location 
-var appServicePlanName = toLower('AppServicePlan-${webAppName}')
-var webSiteName = toLower('wapp-${webAppName}')
+param appName string
 
-resource appServicePlan 'Microsoft.Web/serverfarms@2020-06-01' = {
-  name: appServicePlanName
-  location: location
-  properties: {
-    reserved: true
-  }
-  sku: {
-    name: sku
-  }
-  kind: 'linux'
-}
+@allowed([
+  'dev'
+  'hml'
+  'qa'
+  'prd'
+  'preprd'
+])
+param environment string
+param appNUm string
 
-resource appService 'Microsoft.Web/sites@2020-06-01' = {
-  name: webSiteName
-  location: location
-  properties: {
-    serverFarmId: appServicePlan.id
-    siteConfig: {
-      linuxFxVersion: linuxFxVersion
-    }
-  }
-}
-
+ module webapp 'br:acrdemogenerateddev001.azurecr.io/bicep/modules/webapp:v1' ={
+   name: 'appweb'
+   params: {
+     appName: appName
+     environment: environment
+     appNUm: appNUm
+   }
+ }
+ 
