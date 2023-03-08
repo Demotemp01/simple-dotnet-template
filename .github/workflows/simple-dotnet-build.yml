@@ -10,105 +10,118 @@ jobs:
     uses: Demotemp01/pipeline-templates/.github/workflows/simple-dotnet-build.yml@main
     with:
       dotnet-version: 7.0.x    
-
+  
   deploy-dev:
-    permissions:
-      contents: none
-    runs-on: ubuntu-latest
-    needs: build
-    environment:
-      name: 'Desenvolvimento'
-      url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
+    uses: Demotemp01/pipeline-templates/.github/workflows/dotnet-deploy-bicep-webapp.yml@main
+    with:
+      environment-needed: build
+      environment: dev
+      rgname: ${{ vars.RGNAMEDEV }}
+      cliente: ${{ vars.CLIENTE }}
+      randonname: ${{ vars.RANDOMNAME }} 
+      biceppath: ./bicep/webapp.bicep
+      appname: poc
+   
 
-    steps:
-      - name: Download artifact from build job
-        uses: actions/download-artifact@v3
-        with:
-          name: artifact
-          path: /home/runner/work/artifact
+
+  # deploy-dev:
+  #   permissions:
+  #     contents: none
+  #   runs-on: ubuntu-latest
+  #   needs: build
+  #   environment:
+  #     name: 'Desenvolvimento'
+  #     url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
+
+  #   steps:
+  #     - name: Download artifact from build job
+  #       uses: actions/download-artifact@v3
+  #       with:
+  #         name: artifact
+  #         path: /home/runner/work/artifact
           
-      - uses: actions/checkout@v3
+  #     - uses: actions/checkout@v3
 
-      - uses: azure/login@v1
-        with:
-          creds: ${{ secrets.AZURE_LOGIN }}
+  #     - uses: azure/login@v1
+  #       with:
+  #         creds: ${{ secrets.AZURE_LOGIN }}
 
-      - name: Criar Resources
-        run: |
-          az group create -l brazilsouth -n ${{ vars.RGNAMEDEV }}
-          az deployment group create --mode Incremental --resource-group ${{ vars.RGNAMEDEV }} --template-file ./bicep/webapp.bicep --parameters appName=poc environment=dev appNUm=${{ vars.CLIENTE }}-${{ vars.RANDOMNAME }} 
+  #     - name: Criar Resources
+  #       run: |
+  #         az group create -l brazilsouth -n ${{ vars.RGNAMEDEV }}
+  #         az deployment group create --mode Incremental --resource-group ${{ vars.RGNAMEDEV }} --template-file ./bicep/webapp.bicep --parameters appName=poc environment=dev appNUm=${{ vars.CLIENTE }}-${{ vars.RANDOMNAME }} 
 
-      - name: Deploy to Azure Web App
-        id: deploy-to-webapp
-        uses: azure/webapps-deploy@v2
-        with:
-          app-name: wapp-poc-dev-${{ vars.CLIENTE }}-${{ vars.RANDOMNAME }}
-          package: /home/runner/work/artifact 
+  #     - name: Deploy to Azure Web App
+  #       id: deploy-to-webapp
+  #       uses: azure/webapps-deploy@v2
+  #       with:
+  #         app-name: wapp-poc-dev-${{ vars.CLIENTE }}-${{ vars.RANDOMNAME }}
+  #         package: /home/runner/work/artifact 
 
-  deploy-hml:
-    permissions:
-      contents: none
-    runs-on: ubuntu-latest
-    needs: deploy-dev
-    environment:
-      name: 'Homologacao'
-      url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
+  # deploy-hml:
+  #   permissions:
+  #     contents: none
+  #   runs-on: ubuntu-latest
+  #   needs: deploy-dev
+  #   environment:
+  #     name: 'Homologacao'
+  #     url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
 
-    steps:
-      - name: Download artifact from build job
-        uses: actions/download-artifact@v3
-        with:
-          name: artifact
-          path: /home/runner/work/artifact
+  #   steps:
+  #     - name: Download artifact from build job
+  #       uses: actions/download-artifact@v3
+  #       with:
+  #         name: artifact
+  #         path: /home/runner/work/artifact
           
-      - uses: actions/checkout@v3
+  #     - uses: actions/checkout@v3
 
-      - uses: azure/login@v1
-        with:
-          creds: ${{ secrets.AZURE_LOGIN }}
+  #     - uses: azure/login@v1
+  #       with:
+  #         creds: ${{ secrets.AZURE_LOGIN }}
 
-      - name: Criar Resources
-        run: |
-          az group create -l brazilsouth -n ${{ vars.RGNAMEHML }}
-          az deployment group create --mode Incremental --resource-group ${{ vars.RGNAMEHML }} --template-file ./bicep/webapp.bicep --parameters appName=poc environment=hml appNUm=${{ vars.CLIENTE }}-${{ vars.RANDOMNAME }}
+  #     - name: Criar Resources
+  #       run: |
+  #         az group create -l brazilsouth -n ${{ vars.RGNAMEHML }}
+  #         az deployment group create --mode Incremental --resource-group ${{ vars.RGNAMEHML }} --template-file ./bicep/webapp.bicep --parameters appName=poc environment=hml appNUm=${{ vars.CLIENTE }}-${{ vars.RANDOMNAME }}
 
-      - name: Deploy to Azure Web App
-        id: deploy-to-webapp
-        uses: azure/webapps-deploy@v2
-        with:
-          app-name: wapp-poc-hml-${{ vars.CLIENTE }}-${{ vars.RANDOMNAME }}
-          package: /home/runner/work/artifact 
+  #     - name: Deploy to Azure Web App
+  #       id: deploy-to-webapp
+  #       uses: azure/webapps-deploy@v2
+  #       with:
+  #         app-name: wapp-poc-hml-${{ vars.CLIENTE }}-${{ vars.RANDOMNAME }}
+  #         package: /home/runner/work/artifact 
 
-  deploy-prd:
-    permissions:
-      contents: none
-    runs-on: ubuntu-latest
-    needs: deploy-hml
-    environment:
-      name: 'Producao'
-      url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
+  # deploy-prd:
+  #   permissions:
+  #     contents: none
+  #   runs-on: ubuntu-latest
+  #   needs: deploy-hml
+  #   environment:
+  #     name: 'Producao'
+  #     url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
 
-    steps:
-      - name: Download artifact from build job
-        uses: actions/download-artifact@v3
-        with:
-          name: artifact
-          path: /home/runner/work/artifact
+  #   steps:
+  #     - name: Download artifact from build job
+  #       uses: actions/download-artifact@v3
+  #       with:
+  #         name: artifact
+  #         path: /home/runner/work/artifact
           
-      - uses: actions/checkout@v3
+  #     - uses: actions/checkout@v3
 
-      - uses: azure/login@v1
-        with:
-          creds: ${{ secrets.AZURE_LOGIN }}
+  #     - uses: azure/login@v1
+  #       with:
+  #         creds: ${{ secrets.AZURE_LOGIN }}
 
-      - name: Criar Resources
-        run: |
-          az group create -l brazilsouth -n ${{ vars.RGNAMEPRD }}
-          az deployment group create --mode Incremental --resource-group ${{ vars.RGNAMEPRD }} --template-file ./bicep/webapp.bicep --parameters appName=poc environment=prd appNUm=${{ vars.CLIENTE }}-${{ vars.RANDOMNAME }} 
+  #     - name: Criar Resources
+  #       run: |
+  #         az group create -l brazilsouth -n ${{ vars.RGNAMEPRD }}
+  #         az deployment group create --mode Incremental --resource-group ${{ vars.RGNAMEPRD }} --template-file ./bicep/webapp.bicep --parameters appName=poc environment=prd appNUm=${{ vars.CLIENTE }}-${{ vars.RANDOMNAME }} 
 
-      - name: Deploy to Azure Web App
-        id: deploy-to-webapp
-        uses: azure/webapps-deploy@v2
-        with:
-          app-name: wapp-poc-prd-${{ vars.CLIENTE }}-${{ vars.RANDOMNAME }}
-          package: /home/runner/work/artifact 
+  #     - name: Deploy to Azure Web App
+  #       id: deploy-to-webapp
+  #       uses: azure/webapps-deploy@v2
+  #       with:
+  #         app-name: wapp-poc-prd-${{ vars.CLIENTE }}-${{ vars.RANDOMNAME }}
+  #         package: /home/runner/work/artifact 
