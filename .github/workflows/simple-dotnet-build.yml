@@ -12,9 +12,9 @@ jobs:
       dotnet-version: 7.0.x    
   
   deploy-dev:
+    needs: build
     uses: Demotemp01/pipeline-templates/.github/workflows/dotnet-deploy-bicep-webapp.yml@main
     with:
-      environment-needed: build
       environment: dev
       rgname: ${{ vars.RGNAMEDEV }}
       cliente: ${{ vars.CLIENTE }}
@@ -22,7 +22,27 @@ jobs:
       biceppath: ./bicep/webapp.bicep
       appname: poc
    
+  deploy-hml:
+    needs: deploy-dev
+    uses: Demotemp01/pipeline-templates/.github/workflows/dotnet-deploy-bicep-webapp.yml@main
+    with:
+      environment: hml
+      rgname: ${{ vars.RGNAMEHML }}
+      cliente: ${{ vars.CLIENTE }}
+      randonname: ${{ vars.RANDOMNAME }} 
+      biceppath: ./bicep/webapp.bicep
+      appname: poc
 
+  deploy-prd:
+    needs: deploy-prd
+    uses: Demotemp01/pipeline-templates/.github/workflows/dotnet-deploy-bicep-webapp.yml@main
+    with:
+      environment: prd
+      rgname: ${{ vars.RGNAMEPRD }}
+      cliente: ${{ vars.CLIENTE }}
+      randonname: ${{ vars.RANDOMNAME }} 
+      biceppath: ./bicep/webapp.bicep
+      appname: poc
 
   # deploy-dev:
   #   permissions:
